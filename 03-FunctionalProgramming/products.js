@@ -58,7 +58,7 @@ describe('Sorting', function(){
 					list[j] = temp;
 				}
 	}
-	
+
 	describe('Any list by any attribute', function(){
 		/*function sort(list, attrName){
 			for(var i=0; i < list.length-1; i++)
@@ -110,7 +110,12 @@ describe('Sorting', function(){
 
 describe('Filter', function(){
 	describe('Default Filter (stationary products)', function(){
-		//filter()
-		//console.table(products);
+		function filterStationaryProducts(){
+
+		}
+		var stationaryProducts = filterStationaryProducts();
+		console.table(products);
 	});
+
+	
 });
