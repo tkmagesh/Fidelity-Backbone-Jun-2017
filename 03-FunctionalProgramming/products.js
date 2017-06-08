@@ -129,28 +129,50 @@ describe('Filter', function(){
 					result.push(list[index]);
 			return result;
 		}
-		describe("Costly products [cost > 50] ", function(){
+		function negate(criteriaFn){
+			return function(){
+				return !criteriaFn.apply(this, arguments);
+			}
+		}
+
+		describe("Filter products by cost", function(){
 			var costlyProductCriteria = function(product){
 				return product.cost > 50;
 			};
-			var costlyProducts = filter(products, costlyProductCriteria);
-			console.table(costlyProducts);
-		});
+			describe("Costly products [cost > 50] ", function(){
+				
+				var costlyProducts = filter(products, costlyProductCriteria);
+				console.table(costlyProducts);
+			});
 
-		describe("Affordable products [ cost <= 50 ]", function(){
+			describe("Affordable products [ cost <= 50 ]", function(){
+				/*var affordableProductCriteria = function(product){
+					return !costlyProductCriteria(product);
+				};*/
+				var affordableProductCriteria = negate(costlyProductCriteria);
+				var affordableProducts = filter(products, affordableProductCriteria);
+				console.table(affordableProducts);
+			});
 
-		});
-
-		describe("Under stocked products [ units < 50 ]", function(){
+		})
+		describe("Filter products by stock", function(){
 			var underStockedProductCriteria = function(product){
 				return product.units < 50;
 			};
-			var underStockedProducts = filter(products, underStockedProductCriteria);
-			console.table(underStockedProducts);
-		});
+			describe("Under stocked products [ units < 50 ]", function(){
+				
+				var underStockedProducts = filter(products, underStockedProductCriteria);
+				console.table(underStockedProducts);
+			});
 
-		describe("Well stocked products [ units >= 50 ]", function(){
-
-		});
+			describe("Well stocked products [ units >= 50 ]", function(){
+				/*var wellStockedProductCriteria = function(product){
+					return !underStockedProductCriteria(product);
+				};*/
+				var wellStockedProductCriteria = negate(underStockedProductCriteria)
+				var wellStockedProducts = filter(products, wellStockedProductCriteria);
+				console.table(wellStockedProducts);
+			});
+		})
 	})
 });
