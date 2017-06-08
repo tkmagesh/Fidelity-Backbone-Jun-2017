@@ -12,7 +12,7 @@ var spinner = (function(){
 		up : increment,
 		down : decrement
 	}
-})()
+})();
 
 spinner.up() //=> 1
 spinner.up() //=> 2
