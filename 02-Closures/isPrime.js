@@ -22,6 +22,7 @@ var isPrime = (function (){
 })();
 
 var isPrime = (function (){
+	
 	var cache = {};
 
 	function checkPrime(n){
@@ -36,12 +37,17 @@ var isPrime = (function (){
 		}
 		return true;
 	}
-	function isPrime(n){
+
+	return function(n){
 		if (typeof cache[n] === 'undefined')
-			
-		
-		
+			cache[n] = checkPrime(n);	
 		return cache[n];
 	}
-	return isPrime;
+	
 })();
+
+
+isOddOrEven
+	n -> 'odd' or 'even'
+	
+
