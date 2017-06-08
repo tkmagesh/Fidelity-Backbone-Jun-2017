@@ -111,11 +111,46 @@ describe('Sorting', function(){
 describe('Filter', function(){
 	describe('Default Filter (stationary products)', function(){
 		function filterStationaryProducts(){
-
+			var result = [];
+			for(var index=0; index < products.length; index++)
+				if (products[index].category === 'stationary')
+					result.push(products[index]);
+			return result;
 		}
 		var stationaryProducts = filterStationaryProducts();
-		console.table(products);
+		console.table(stationaryProducts);
 	});
 
-	
+	describe('Any list by any criteria', function(){
+		function filter(list, criteriaFn){
+			var result = [];
+			for(var index=0; index < list.length; index++)
+				if (criteriaFn(list[index]))
+					result.push(list[index]);
+			return result;
+		}
+		describe("Costly products [cost > 50] ", function(){
+			var costlyProductCriteria = function(product){
+				return product.cost > 50;
+			};
+			var costlyProducts = filter(products, costlyProductCriteria);
+			console.table(costlyProducts);
+		});
+
+		describe("Affordable products [ cost <= 50 ]", function(){
+
+		});
+
+		describe("Under stocked products [ units < 50 ]", function(){
+			var underStockedProductCriteria = function(product){
+				return product.units < 50;
+			};
+			var underStockedProducts = filter(products, underStockedProductCriteria);
+			console.table(underStockedProducts);
+		});
+
+		describe("Well stocked products [ units >= 50 ]", function(){
+
+		});
+	})
 });
