@@ -91,19 +91,28 @@ describe('Sorting', function(){
 						list[j] = temp;
 					}
 		}*/
+		var productComparerByValue = function(p1, p2){
+			var p1Value = p1.cost * p1.units,
+				p2Value = p2.cost * p2.units;
+			if (p1Value < p2Value) return -1;
+			if (p1Value === p2Value) return 0;
+			return 1;
+		}
 		describe('products by value [cost * units]', function(){
-			var productComparerByValue = function(p1, p2){
-				var p1Value = p1.cost * p1.units,
-					p2Value = p2.cost * p2.units;
-				if (p1Value < p2Value) return -1;
-				if (p1Value === p2Value) return 0;
-				return 1;
-			}
+			
 			sort(products, productComparerByValue);
 			console.table(products);
 		});
-
-		
+		function descending(comparerFn){
+			return function(){
+				return comparerFn.apply(this, arguments) * -1;
+			}
+		}
+		describe('products by value [cost * units] (descending)', function(){
+			var descendingProductComparerByValue = descending(productComparerByValue);
+			sort(products, descendingProductComparerByValue);
+			console.table(products);
+		});
 
 	});
 });
@@ -175,4 +184,39 @@ describe('Filter', function(){
 			});
 		})
 	})
+});
+
+describe('GroupBy', function(){
+	function groupBy(list, keySelector){
+		var result = {};
+		for(var index=0; index < list.length; index++){
+			var key = keySelector(list[index]);
+			/*if (typeof result[key] === 'undefined')
+				result[key] = [];*/
+			result[key] = result[key] || [];
+			result[key].push(list[index]);	
+		}
+		return result;
+	}
+	function printGroup(groupedObj){
+		for(var key in groupedObj){
+			describe('Key - [' + key + ']', function(){
+				console.table(groupedObj[key]);
+			});
+		}
+	}
+	describe('Products by category', function(){
+		var categoryKeySelector = function(product){
+			return product.category;
+		};
+		var productsByCategory = groupBy(products, categoryKeySelector);
+		printGroup(productsByCategory);
+	});
+	describe('Products by cost', function(){
+		var costKeySelector = function(product){
+			return product.cost > 50 ? 'costly' : 'affordable';
+		};
+		var productsByCost = groupBy(products, costKeySelector);
+		printGroup(productsByCost);
+	});
 });
