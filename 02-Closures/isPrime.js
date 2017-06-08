@@ -60,17 +60,41 @@ var isOddOrEven = (function (){
 	
 })();
 
-
-
 function memoize(algoFn){
 	var cache = {};
-	return function(n){
-		if (typeof cache[n] === 'undefined')
-			cache[n] = algoFn(n);	
-		return cache[n];
+	return function(){
+		var key = JSON.stringify(arguments);
+		if (typeof cache[key] === 'undefined')
+			cache[key] = algoFn.apply(this, arguments);	
+		return cache[key];
 	}
 	
 }
 
+function memoize(algoFn, keyGen){
+	var cache = {};
+	return function(){
+		var key = keyGen ? keyGen.apply(this, arguments) : arguments[0];
+		if (typeof cache[key] === 'undefined')
+			cache[key] = algoFn.apply(this, arguments);	
+		return cache[key];
+	}
+}
 
+var cachedAdd = memoize(
+	function(n1, n2){ 
+		console.log('processing ', n1, ' and ', n2); 
+		return n1 + n2; 
+	}
+);
+
+var cachedAdd = memoize(
+	function(n1, n2){ 
+		console.log('processing ', n1, ' and ', n2); 
+		return n1 + n2; 
+	}, 
+	function(){ 
+		return JSON.stringify(arguments); 
+	}
+);
 
