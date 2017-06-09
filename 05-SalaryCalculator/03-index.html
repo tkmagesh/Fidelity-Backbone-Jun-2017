@@ -42,13 +42,25 @@
 		$(function(){
 			var calculator = new SalaryCalculator();
 
-			$('#btnCalculate').click(function(){
-				
-				calculator.basic = $('#txtBasic').val().toInt();
-				calculator.hra = $('#txtHra').val().toInt();
-				calculator.da = $('#txtDa').val().toInt();
-				calculator.tax = $('#rangeTax').val().toInt();
 
+			$('#txtBasic').change(function(){
+				calculator.basic = this.value.toInt();
+			});
+			
+			$('#txtHra').change(function(){
+				calculator.hra = this.value.toInt();
+			});
+			
+			$('#txtDa').change(function(){
+				calculator.da = this.value.toInt();
+			});
+			
+			$('#rangeTax').change(function(){
+				calculator.tax = this.value.toInt();
+			});
+			
+
+			$('#btnCalculate').click(function(){
 				calculator.calculate();
 
 				$('#divResult').html(calculator.salary);
