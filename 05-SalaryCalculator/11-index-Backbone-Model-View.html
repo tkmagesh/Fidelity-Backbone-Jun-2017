@@ -74,31 +74,55 @@
 		//View
 
 		var SalaryCalculatorView = Backbone.View.extend({
+			//React to user actions
+			events : {
+				'change #txtBasic' : 'updateBasic',
+				'change #txtHra' : 'updateHra',
+				'change #txtDa'	: 'updateDa',
+				'change #rangeTax' : 'updateTax',
+				'click #btnCalculate' : 'triggerCalculate'
+			},
+			updateBasic : function(evt){
+				this.model.set('basic', evt.target.value.toInt());
+			},
+			updateHra : function(evt){
+				this.model.set('hra', evt.target.value.toInt());
+			},
+			updateDa : function(evt){
+				this.model.set('da', evt.target.value.toInt());
+			},
+			updateTax : function(evt){
+				this.model.set('tax', evt.target.value.toInt());
+			},
+			triggerCalculate : function(evt){
+				this.model.calculate();
+			},
 
 			//React to model changes
 			initialize : function(){
-				console.log(this.model);
-				var calculator = this.model;
-
-				calculator.on('change:salary', function(){
-					this.$('#divResult').html(calculator.get('salary'));
-				});
-				calculator.on('change:basic', function(){
-					this.$('#txtBasic').val(calculator.get('basic'));
-				});
-				calculator.on('change:hra', function(){
-					this.$('#txtHra').val(calculator.get('hra'));
-				});
-				calculator.on('change:da', function(){
-					this.$('#txtDa').val(calculator.get('da'));
-				});
-				calculator.on('change:tax', function(){
-					this.$('#rangeTax').val(calculator.get('tax'));
-				});
-				calculator.on('change:tax', function(){
-					this.$('#spanTax').html(calculator.get('tax'));
-				});
+				this.listenTo(this.model, 'change:salary', this.renderSalary);
+				this.listenTo(this.model, 'change:basic', this.renderBasic);
+				this.listenTo(this.model, 'change:hra', this.renderHra);
+				this.listenTo(this.model, 'change:da', this.renderDa);
+				this.listenTo(this.model, 'change:tax', this.renderTax);
 			},
+			renderTax : function(){
+				this.$('#rangeTax').val(this.model.get('tax'));
+				this.$('#spanTax').html(this.model.get('tax'));
+			},
+			renderDa : function(){
+				this.$('#txtDa').val(this.model.get('da'));
+			},
+			renderHra : function(){
+				this.$('#txtHra').val(this.model.get('hra'));
+			},
+			renderSalary : function(){
+				this.$('#divResult').html(this.model.get('salary'));
+			},
+			renderBasic : function(){
+				this.$('#txtBasic').val(this.model.get('basic'));
+			},
+
 			render : function(){
 				this.$el.html($('#calculatorTemplate').html());
 				return this;
