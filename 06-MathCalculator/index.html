@@ -6,6 +6,8 @@
 	<script src="jquery-3.2.1.js"></script>
 	<script src="underscore.js"></script>
 	<script src="backbone.js"></script>
+	<script src="handlebars.js"></script>
+
 	<script type="text/template" id="calculator1Template">
 		<div class="content">
 			<input type="text" id="txtNumber1">
@@ -16,6 +18,18 @@
 			<input type="button" value="Multiply" id="btnMultiply">
 			<input type="button" value="Divide" id="btnDivide">
 			<div id="divResult">[Result]</div>
+		</div>
+	</script>
+	<script type="text/template" id="calculatorHandlebarsTemplate">
+		<div class="content">
+			<input type="text" id="txtNumber1" value={{number1}}>
+			<input type="text" id="txtNumber2" value={{number2}}>
+			<br>
+			<input type="button" value="Add" id="btnAdd">
+			<input type="button" value="Subtract" id="btnSubtract">
+			<input type="button" value="Multiply" id="btnMultiply">
+			<input type="button" value="Divide" id="btnDivide">
+			<div id="divResult">{{result}}</div>
 		</div>
 	</script>
 	<script type="text/template" id="calculator2Template">
@@ -57,9 +71,13 @@
 			}
 		});
 
-		var CalculatorView1 = Backbone.View.extend({
+		//Incremental View updates
+		/*var CalculatorView1 = Backbone.View.extend({
 			render : function(){
 				this.$el.html($('#calculator1Template').html());
+				this.$('#txtNumber1').val(this.model.get('number1'));
+				this.$('#txtNumber2').val(this.model.get('number2'));
+				this.$('#divResult').html(this.model.get('result'));
 				return this;
 			},
 			//react to model changes
@@ -105,11 +123,59 @@
 				this.model.divide();
 			}
 
+		});*/
+
+		//Use an throw view updates
+		var CalculatorView1 = Backbone.View.extend({
+			render : function(){
+				if (!this.templateFn){
+					var templateHtml = $('#calculatorHandlebarsTemplate').html();
+					this.templateFn = Handlebars.compile(templateHtml);
+				}
+				this.$el.html(this.templateFn(this.model.toJSON()));
+				return this;
+			},
+			//react to model changes
+			initialize : function(){
+				this.listenTo(this.model, 'change', this.render);
+			},
+			
+			//react to user actions
+			events : {
+				'change #txtNumber1' : 'updateNumber1',
+				'change #txtNumber2' : 'updateNumber2',
+				'click #btnAdd' : 'triggerAdd',
+				'click #btnSubtract' : 'triggerSubtract',
+				'click #btnMultiply' : 'triggerMultiply',
+				'click #btnDivide' : 'triggerDivide',
+			},
+			updateNumber1 : function(evt){
+				this.model.set('number1', parseInt(evt.target.value, 10));
+			},
+			updateNumber2 : function(evt){
+				this.model.set('number2', parseInt(evt.target.value, 10));
+			},
+			triggerAdd : function(){
+				this.model.add();
+			},
+			triggerSubtract : function(){
+				this.model.subtract();
+			},
+			triggerMultiply : function(){
+				this.model.multiply();
+			},
+			triggerDivide : function(){
+				this.model.divide();
+			}
+
 		});
 
 		var CalculatorView2 = Backbone.View.extend({
 			render : function(){
 				this.$el.html($('#calculator2Template').html());
+				this.$('#txtNumber1').val(this.model.get('number1'));
+				this.$('#txtNumber2').val(this.model.get('number2'));
+				this.$('#divResult').html(this.model.get('result'));
 				return this;
 			},
 			//react to model changes
@@ -149,13 +215,13 @@
 	</script>
 	<script>
 		$(function(){
-			var calculator = new Calculator();
+			window.calculator = new Calculator({number1 : 1000, number2 : 20000});
 
 			var v1 = new CalculatorView1({model : calculator});
 			v1.render().$el.appendTo(document.body);
 
-			var v2 = new CalculatorView2({model : calculator});
-			v2.render().$el.appendTo(document.body);
+			/*var v2 = new CalculatorView2({model : calculator});
+			v2.render().$el.appendTo(document.body);*/
 
 		})
 	</script>
