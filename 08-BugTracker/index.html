@@ -38,33 +38,130 @@
 			font-style : italic;
 		}
 	</style>
+	<script src="jquery-3.2.1.js"></script>
+	<script src="underscore.js"></script>
+	<script src="backbone.js"></script>
+	<script src="handlebars.js"></script>
+	<script type="text/x-text-template" id="bugItemTemplate">
+			{{#if isClosed}}
+				<span class="bugname closed">{{name}}</span>
+			{{else}}
+				<span class="bugname">{{name}}</span>
+			{{/if}}
+			<div class="datetime">{{createdAt}}</div>
+		
+	</script>
+	<script>
+		var Bug = Backbone.Model.extend({
+			name : '',
+			isClosed : false,
+			toggle : function(){
+				this.set('isClosed', !this.get('isClosed'));
+			}
+		});
+
+		var BugsCollection = Backbone.Collection.extend({
+			model : Bug,
+			removeClosed : function(){
+				this.forEach(function(model){
+					if (model.get('isClosed')){
+						model.destroy();
+					}
+				});
+			},
+			getClosedCount : function(){
+				return this.reduce(function(result, model){
+					return model.get('isClosed') ? ++result : result;
+				},0);
+			}
+		});
+
+		var BugView = Backbone.View.extend({
+			tagName : 'li',
+			render : function(){
+				if (!this.templateFn){
+					this.templateFn = Handlebars.compile($('#bugItemTemplate').html());
+				}
+				this.$el.html(this.templateFn(this.model.toJSON()));
+				return this;
+			},
+			remove : function(){
+				this.$el.remove();
+			},
+			initialize : function(){
+				this.listenTo(this.model, 'change', this.render);
+				this.listenTo(this.model, 'destroy', this.remove);
+			},
+			events : {
+				'click span.bugname' : 'triggerToggle'
+			},
+			triggerToggle : function(){
+				console.log('triggering togle');
+				this.model.toggle();
+			}
+
+		});
+
+		var BugsCollectionView = Backbone.View.extend({
+			//React to collection changes
+			initialize : function(){
+				this.listenTo(this.collection, 'add', this.renderNewBug);
+				this.listenTo(this.collection, 'all', this.updateStats);
+			},
+			updateStats : function(){
+				var total = this.collection.length,
+					closedCount = this.collection.getClosedCount();
+				this.$('.stats > .closed').html(closedCount);
+				this.$('.stats > .total').html(total);
+			},
+			renderNewBug : function(model, collection){
+				var newBugView = new BugView({model : model})
+				newBugView.render().$el.appendTo(this.$('.list > ol'));
+			},
+			//React to user actions
+			events : {
+				'click #btnAddNew' : 'triggerAddNew',
+				'click #btnRemoveClosed' : 'triggerRemoveClosed'
+			},
+			triggerAddNew : function(){
+				var bugName = this.$('#txtBugName').val();
+				var newBug = {name : bugName, createdAt : new Date()};
+				bugs.add(newBug);
+			},
+			triggerRemoveClosed : function(){
+				this.collection.removeClosed();
+			}
+		});
+
+		$(function(){
+			window.bugs = new BugsCollection();
+			var bugsView = new BugsCollectionView({
+				collection : bugs,
+				el : '#content'
+			});
+		});
+
+	</script>
 </head>
 <body>
 	<h1>Bug Tracker</h1>
 	<hr>
 	<div id="content">
 		<section class="stats">
-			<span class="closed">2</span>
+			<span class="closed">0</span>
 			<span> / </span>
-			<span>5</span>
+			<span class="total">0</span>
 		</section>
 		<section class="edit">
 			<label for="">Bug Name :</label>
 			<input type="text" name="" id="txtBugName">
-			<input type="button" value="Add New">
+			<input type="button" value="Add New" id="btnAddNew">
 		</section>
 		<section class="list">
 			<ol>
-				<li>
-					<span class="bugname">This is bug - 1</span>
-					<div class="datetime">[CreatedAt]</div>
-				</li>
-				<li>
-					<span class="bugname closed">This is bug - 2</span>
-					<div class="datetime">[CreatedAt]</div>
-				</li>
+				
 			</ol>
-			<input type="button" value="Remove Closed">
+			<input type="button" value="Remove Closed" id="btnRemoveClosed">
 		</section>
 	</div>
 </body>
