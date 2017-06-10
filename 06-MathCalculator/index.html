@@ -3,32 +3,108 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Math Calculator</title>
+	<script src="jquery-3.2.1.js"></script>
+	<script src="underscore.js"></script>
+	<script src="backbone.js"></script>
+	<script type="text/template" id="calculator1Template">
+		<div class="content">
+			<input type="text" id="txtNumber1">
+			<input type="text" id="txtNumber2">
+			<br>
+			<input type="button" value="Add" id="btnAdd">
+			<input type="button" value="Subtract" id="btnSubtract">
+			<input type="button" value="Multiply" id="btnMultiply">
+			<input type="button" value="Divide" id="btnDivide">
+			<div id="divResult">[Result]</div>
+		</div>
+	</script>
+	<script type="text/template" id="calculator2Template">
+		<div class="content">
+			<input type="text" >
+			<select name="" id="">
+				<option value="add">add</option>
+				<option value="subtract">subtract</option>
+				<option value="multiply">multiply</option>
+				<option value="divide">divide</option>
+			</select>
+			<input type="text" >
+			<input type="button" value="Calculate">
+			<div>[Result]</div>
+		</div>
+	</script>
+	<script>
+		var Calculator = Backbone.Model.extend({
+			defaults : {
+				number1 : 0,
+				number2 : 0,
+				result : 0
+			},
+			add : function(){
+				this.result = this.number1 + this.number2;
+			},
+			subtract : function(){
+				this.result = this.number1 - this.number2;
+			},
+			multiply : function(){
+				this.result = this.number1 * this.number2;
+			},
+			divide : function(){
+				this.result = this.number1 / this.number2;
+			}
+		});
+
+		var CalculatorView1 = Backbone.View.extend({
+			render : function(){
+				this.$el.html($('#calculator1Template').html());
+			},
+			//react to model changes
+			initialize : function(){
+				this.listenTo(this.model, 'change:number1', this.renderNumber1);
+				this.listenTo(this.model, 'change:number2', this.renderNumber2);
+				this.listenTo(this.model, 'change:result', this.renderResult);
+			},
+			renderNumber1 : function(model, value){
+				this.$('#txtNumber1').val(value);
+			},
+			renderNumber2 : function(model, value){
+				this.$('#txtNumber2').val(value);
+			},
+			renderResult : function(model, value){
+				this.$('#divResult').html(value);
+			},
+			//react to user actions
+			events : {
+				'change #txtNumber1' : 'updateNumber1',
+				'change #txtNumber2' : 'updateNumber2',
+				'click #btnAdd' : 'triggerAdd',
+				'click #btnSubtract' : 'triggerSubtract',
+				'click #btnMultiply' : 'triggerMultiply',
+				'click #btnDivide' : 'triggerDivide',
+			},
+			updateNumber1 : function(evt){
+				this.model.set('number1', parseInt(evt.target.value, 10));
+			},
+			updateNumber2 : function(evt){
+				this.model.set('number2', parseInt(evt.target.value, 10));
+			},
+			triggerAdd : function(){
+				this.model.add();
+			},
+			triggerSubtract : function(){
+				this.model.subtract();
+			},
+			triggerMultiply : function(){
+				this.model.multiply();
+			},
+			triggerDivide : function(){
+				this.model.divide();
+			}
+
+		})
+	</script>
 </head>
 <body>
 	<h1>Math Calculator</h1>
-	<hr>
-	<div class="content">
-		<input type="text" >
-		<input type="text" >
-		<br>
-		<input type="button" value="Add">
-		<input type="button" value="Subtract">
-		<input type="button" value="Multiply">
-		<input type="button" value="Divide">
-		<div>[Result]</div>
-	</div>
-	<hr>
-	<div class="content">
-		<input type="text" >
-		<select name="" id="">
-			<option value="add">add</option>
-			<option value="subtract">subtract</option>
-			<option value="multiply">multiply</option>
-			<option value="divide">divide</option>
-		</select>
-		<input type="text" >
-		<input type="button" value="Calculate">
-		<div>[Result]</div>
-	</div>
+	
 </body>
 </html>
