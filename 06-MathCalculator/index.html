@@ -20,16 +20,16 @@
 	</script>
 	<script type="text/template" id="calculator2Template">
 		<div class="content">
-			<input type="text" >
-			<select name="" id="">
+			<input type="text" id="txtNumber1">
+			<select id="selectOperation">
 				<option value="add">add</option>
 				<option value="subtract">subtract</option>
 				<option value="multiply">multiply</option>
 				<option value="divide">divide</option>
 			</select>
-			<input type="text" >
-			<input type="button" value="Calculate">
-			<div>[Result]</div>
+			<input type="text" id="txtNumber2">
+			<input type="button" value="Calculate" id="btnCalculate">
+			<div id="divResult">[Result]</div>
 		</div>
 	</script>
 	<script>
@@ -40,22 +40,27 @@
 				result : 0
 			},
 			add : function(){
-				this.result = this.number1 + this.number2;
+				var result = this.get('number1') + this.get('number2');
+				this.set('result', result);
 			},
 			subtract : function(){
-				this.result = this.number1 - this.number2;
+				var result = this.get('number1') - this.get('number2');
+				this.set('result', result);
 			},
 			multiply : function(){
-				this.result = this.number1 * this.number2;
+				var result = this.get('number1') * this.get('number2');
+				this.set('result', result);
 			},
 			divide : function(){
-				this.result = this.number1 / this.number2;
+				var result = this.get('number1') / this.get('number2');
+				this.set('result', result);
 			}
 		});
 
 		var CalculatorView1 = Backbone.View.extend({
 			render : function(){
 				this.$el.html($('#calculator1Template').html());
+				return this;
 			},
 			//react to model changes
 			initialize : function(){
@@ -99,6 +104,58 @@
 			triggerDivide : function(){
 				this.model.divide();
 			}
+
+		});
+
+		var CalculatorView2 = Backbone.View.extend({
+			render : function(){
+				this.$el.html($('#calculator2Template').html());
+				return this;
+			},
+			//react to model changes
+			initialize : function(){
+				this.listenTo(this.model, 'change:number1', this.renderNumber1);
+				this.listenTo(this.model, 'change:number2', this.renderNumber2);
+				this.listenTo(this.model, 'change:result', this.renderResult);
+			},
+			renderNumber1 : function(model, value){
+				this.$('#txtNumber1').val(value);
+			},
+			renderNumber2 : function(model, value){
+				this.$('#txtNumber2').val(value);
+			},
+			renderResult : function(model, value){
+				this.$('#divResult').html(value);
+			},
+			events : {
+				'change #txtNumber1' : 'updateNumber1',
+				'change #txtNumber2' : 'updateNumber2',
+				'change #selectOperation' : 'updateOperation',
+				'click #btnCalculate' : 'triggerCalculation'
+			},
+			updateNumber1 : function(evt){
+				this.model.set('number1', parseInt(evt.target.value, 10));
+			},
+			updateNumber2 : function(evt){
+				this.model.set('number2', parseInt(evt.target.value, 10));
+			},
+			updateOperation : function(evt){
+				this.operation = evt.target.value;
+			},
+			triggerCalculation : function(){
+				this.model[this.operation]();
+			}
+		});
+	</script>
+	<script>
+		$(function(){
+			var calculator = new Calculator();
+
+			var v1 = new CalculatorView1({model : calculator});
+			v1.render().$el.appendTo(document.body);
+
+			var v2 = new CalculatorView2({model : calculator});
+			v2.render().$el.appendTo(document.body);
 
 		})
 	</script>
