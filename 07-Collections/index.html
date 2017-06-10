@@ -7,6 +7,7 @@
 	<script src="underscore.js"></script>
 	<script src="backbone.js"></script>
 	<script src="handlebars.js"></script>
+
 	<script>
 		var Product = Backbone.Model.extend({
 			name : ''
@@ -15,15 +16,45 @@
 			model : Product
 		});
 
+		var ProductsView = Backbone.View.extend({
+			//react to user actions
+			events : {
+				'click #btnAddNew' : 'triggerAdd'
+			},
+			triggerAdd : function(){
+				var productName = this.$('#txtProductName').val();
+				var newProduct = new Product({name : productName});
+				this.collection.add(newProduct);
+			},
+			//react to model changes
+			initialize : function(){
+				this.listenTo(this.collection, 'add', this.renderProduct)
+			},
+			renderProduct(model){
+				console.log(arguments);
+				var $newProduct = $('<li></li>').html(model.get('name'));
+				this.$('#productList').append($newProduct);
+			}
+		});
+
+		$(function(){
+			 window.products = new ProductsCollection();
+			 window.productsView = new ProductsView({ 
+				el : document.getElementById('content'),
+				collection : products
+			});
+		});
+
 	</script>
 </head>
 <body>
-	<label for="">Product Name :</label>
-	<input type="text" name="" id="">
-	<input type="button" value="Add New" id="btnAddNew">
-	<ol>
-		<li>Pen</li>
-		<li>Pencil</li>
-	</ol>
+	<div id="content">
+		<label for="">Product Name :</label>
+		<input type="text" id="txtProductName">
+		<input type="button" value="Add New" id="btnAddNew">
+		<ol id="productList">
+			
+		</ol>
+	</div>
 </body>
 </html>
