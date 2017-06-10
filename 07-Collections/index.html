@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Collections Demo</title>
+	<script src="jquery-3.2.1.js"></script>
+	<script src="underscore.js"></script>
+	<script src="backbone.js"></script>
+	<script src="handlebars.js"></script>
+	<script>
+		var Product = Backbone.Model.extend({
+			name : ''
+		});
+		var ProductsCollection = Backbone.Collection.extend({
+			model : Product
+		});
+
+	</script>
+</head>
+<body>
+	<label for="">Product Name :</label>
+	<input type="text" name="" id="">
+	<input type="button" value="Add New" id="btnAddNew">
+	<ol>
+		<li>Pen</li>
+		<li>Pencil</li>
+	</ol>
+</body>
+</html>
